@@ -1,0 +1,23 @@
+AuthToken="EgJ8a6DoQJqr"
+Address="127.0.0.1:8881"
+HarborAddress="harbor.xxxx.com/library"
+
+[LoggerConfig]
+Filename="harbor.log"
+MaxSize=20
+
+[TelegramConfig]
+BoltDBPath="bolt.db"
+BotToken="telegram bot token"
+UserRegisterToken="QJqrW4Vg"
+
+[LoggerConfig]
+Filename="harbor.log"
+MaxSize=25 # 25MB
+
+[[Tasks]]
+HarborKey="followme"
+TaskName="task name"
+Path=""
+Cmd="docker-compose up -d"
+Heartbeat="https://xxxx"
