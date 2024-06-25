@@ -27,7 +27,7 @@ func (s *Server) Run() error {
 	gin.SetMode(gin.ReleaseMode)
 
 	s.app.Use(middleware.Cors())
-	s.app.Use(middleware.Auth(s.conf.AuthToken))
+	//s.app.Use(middleware.Auth(s.conf.AuthToken))
 
 	s.router()
 
@@ -35,5 +35,10 @@ func (s *Server) Run() error {
 }
 
 func (s *Server) router() {
-	s.app.POST("/hook", s.webHook)
+	s.app.POST("/hook", middleware.Auth(s.conf.AuthToken), s.webHook)
+	s.app.GET("/heartbeat", func(ctx *gin.Context) {
+		ctx.JSON(200, gin.H{
+			"message": "success",
+		})
+	})
 }
