@@ -50,8 +50,21 @@ func (s *Server) cicdLogic(task conf.Task, hk harborHook) {
 	}
 
 	// ls コマンドを実行
-	cmd := exec.Command(task.Cmd)
+	parts := strings.Fields(fmt.Sprintf("docker pull %s", dockerImg))
+	cmd := exec.Command(parts[0], parts[1:]...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err = cmd.Run()
+	if err != nil {
+		log.Error().Msgf("Cicd Error: 执行错误 %s", err)
+		s.noticeLog(task.HarborKey, task.TaskName, fmt.Sprintf("cicd Error: 执行错误 %s", err))
+		return
+	}
 
+	parts = strings.Fields(task.Cmd)
+	cmd = exec.Command(parts[0], parts[1:]...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 	err = cmd.Run()
 	if err != nil {
 		log.Error().Msgf("Cicd Error: 执行错误 %s", err)

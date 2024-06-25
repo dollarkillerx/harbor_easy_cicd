@@ -62,7 +62,7 @@ func (s *Server) telegram() {
 				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "身份验证失败")
 				msg.ReplyToMessageID = update.Message.MessageID
 				bot.Send(msg)
-				return
+				continue
 			}
 
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "身份验证成功")
