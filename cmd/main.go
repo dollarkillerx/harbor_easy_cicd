@@ -17,13 +17,13 @@ var configDirs string
 
 func init() {
 	const (
-		defaultConfigFilename = "configs"
+		defaultConfigFilename = "config"
 		configUsage           = "Name of the configs file, without extension"
 		defaultConfigDirs     = "./,./configs/"
 		configDirUsage        = "Directories to search for configs file, separated by ','"
 	)
 	flag.StringVar(&configFilename, "c", defaultConfigFilename, configUsage)
-	flag.StringVar(&configFilename, "dev_config", defaultConfigFilename, configUsage)
+	flag.StringVar(&configFilename, "config", defaultConfigFilename, configUsage)
 	flag.StringVar(&configDirs, "cPath", defaultConfigDirs, configDirUsage)
 }
 
@@ -31,7 +31,7 @@ func main() {
 	flag.Parse()
 
 	// config
-	var appConfig conf.EasyCiCDConfig
+	var appConfig conf.Config
 	err := config.InitConfiguration(configFilename, strings.Split(configDirs, ","), &appConfig)
 	if err != nil {
 		panic(err)

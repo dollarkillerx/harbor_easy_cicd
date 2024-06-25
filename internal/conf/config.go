@@ -2,7 +2,7 @@ package conf
 
 import "github.com/dollarkillerx/harbor_easy_cicd/internal/sdk/config"
 
-type EasyCiCDConfig struct {
+type Config struct {
 	AuthToken     string // auth token
 	Address       string // address
 	HarborAddress string
