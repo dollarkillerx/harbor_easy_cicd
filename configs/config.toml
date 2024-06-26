@@ -1,0 +1,30 @@
+AuthToken="EgJ8a6DoQJqr"
+Address="127.0.0.1:8881"
+HarborAddress="harbor.dollarkiller.com/library"
+
+#[TelegramConfig]
+#BoltDBPath="bolt.db"
+#BotToken="7391631700:AAEwR1u0LsL8X8vWUSmhf2tKuVhmqqZKgoI"
+#UserRegisterToken="QJqrW4Vg"
+
+[LoggerConfig]
+Filename="harbor.log"
+MaxSize=25 # 25MB
+
+
+[AdminAuth]
+Token="WUSmhf2tKuVhm"
+
+[PostgresConfig]
+Host="192.168.78.129"
+Port=5432
+User="root"
+Password="root"
+DBName="cicd"
+
+[[Tasks]]
+HarborKey="followme"
+TaskName="followme task"
+Path="/root/workspace/followme"
+Cmd="docker-compose up -d"
+Heartbeat="https://followme.dollarkiller.com/heartbeat"
