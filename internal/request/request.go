@@ -26,20 +26,22 @@ func (t *TaskPayload) Validate() error {
 	t.Cmd = strings.TrimSpace(t.Cmd)
 	t.Heartbeat = strings.TrimSpace(t.Heartbeat)
 
-	if t.HarborKey == "" {
-		return errors.New("Harbor 镜像名称不能为空")
-	}
+	if t.Type == TaskAdd || t.Type == TaskEdit {
+		if t.HarborKey == "" {
+			return errors.New("Harbor 镜像名称不能为空")
+		}
 
-	if t.TaskName == "" {
-		return errors.New("TaskName 不能为空")
-	}
+		if t.TaskName == "" {
+			return errors.New("TaskName 不能为空")
+		}
 
-	if t.Path == "" {
-		return errors.New("Path 不能为空")
-	}
+		if t.Path == "" {
+			return errors.New("Path 不能为空")
+		}
 
-	if t.Cmd == "" {
-		return errors.New("Cmd 不能为空")
+		if t.Cmd == "" {
+			return errors.New("Cmd 不能为空")
+		}
 	}
 
 	return nil

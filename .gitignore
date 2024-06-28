@@ -22,4 +22,5 @@ go.work
 go.work.sum
 .idea
 configs.toml
-configs.toml
+config.toml
+harbor.log
