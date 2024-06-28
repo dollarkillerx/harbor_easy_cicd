@@ -1,23 +1,23 @@
-AuthToken="EgJ8a6DoQJqr"
+AuthToken="xxxxx"
 Address="127.0.0.1:8881"
-HarborAddress="harbor.xxxx.com/library"
-
-[LoggerConfig]
-Filename="harbor.log"
-MaxSize=20
+HarborAddress="harbor.xxxxx.com/library"
 
 [TelegramConfig]
 BoltDBPath="bolt.db"
-BotToken="telegram bot token"
+BotToken="7391631700:xxxxxxxx"
 UserRegisterToken="QJqrW4Vg"
 
 [LoggerConfig]
 Filename="harbor.log"
 MaxSize=25 # 25MB
 
-[[Tasks]]
-HarborKey="followme"
-TaskName="task name"
-Path=""
-Cmd="docker-compose up -d"
-Heartbeat="https://xxxx"
+[AdminAuth]
+Token="xxxxxxx"
+
+[PostgresConfig]
+Host="127.0.0.1"
+Port=5432
+User="root"
+Password="root"
+DBName="cicd"
+

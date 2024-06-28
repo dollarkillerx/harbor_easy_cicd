@@ -98,7 +98,7 @@ func (s *Server) logs(ctx *gin.Context) {
 	} else {
 		atoi, err := strconv.Atoi(id)
 		if err == nil {
-			s.db.Model(&models.TaskLogs{}).Where("task_id = ?", atoi).Order("created_at desc").Find(&logs)
+			s.db.Model(&models.TaskLogs{}).Where("task_id = ?", atoi).Order("created_at desc").Limit(20).Find(&logs)
 		}
 	}
 

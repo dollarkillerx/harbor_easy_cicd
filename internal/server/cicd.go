@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/dollarkillerx/harbor_easy_cicd/internal/models"
 	"github.com/dollarkillerx/harbor_easy_cicd/internal/utils"
@@ -109,6 +110,8 @@ func (s *Server) cicdLogic(task models.Task, hk harborHook) {
 		s.log(logId, true, fmt.Sprintf("success %s", task.Heartbeat))
 		return
 	}
+
+	s.db.Model(&models.Task{}).Where("id = ?", task.ID).Update("last_run_time", time.Now().Unix())
 
 	s.noticeLog(task.HarborKey, task.TaskName, "success")
 	s.log(logId, true, fmt.Sprintf("success"))
