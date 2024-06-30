@@ -2,15 +2,14 @@ package server
 
 import (
 	"fmt"
+	"github.com/dollarkillerx/harbor_easy_cicd/internal/models"
+	"github.com/dollarkillerx/harbor_easy_cicd/internal/utils"
+	"github.com/rs/zerolog/log"
 	"net/http"
 	"os"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/dollarkillerx/harbor_easy_cicd/internal/models"
-	"github.com/dollarkillerx/harbor_easy_cicd/internal/utils"
-	"github.com/rs/zerolog/log"
 )
 
 var mu sync.Mutex
@@ -24,8 +23,10 @@ func (s *Server) cicd(hk harborHook) {
 
 	for _, i := range tasks {
 		if i.HarborKey == hk.EventData.Repository.Name {
-			s.noticeLog(i.HarborKey, i.TaskName, "获取到任务")
-			s.cicdLogic(i, hk)
+			if i.Run {
+				s.noticeLog(i.HarborKey, i.TaskName, "获取到任务")
+				s.cicdLogic(i, hk)
+			}
 		}
 	}
 }
@@ -90,6 +91,8 @@ func (s *Server) cicdLogic(task models.Task, hk harborHook) {
 		return
 	}
 
+	s.db.Model(&models.Task{}).Where("id = ?", task.ID).Update("last_run_time", time.Now().Unix())
+
 	task.Heartbeat = strings.TrimSpace(task.Heartbeat)
 	if task.Heartbeat != "" {
 		resp, err := http.Get(task.Heartbeat)
@@ -110,8 +113,6 @@ func (s *Server) cicdLogic(task models.Task, hk harborHook) {
 		s.log(logId, true, fmt.Sprintf("success %s", task.Heartbeat))
 		return
 	}
-
-	s.db.Model(&models.Task{}).Where("id = ?", task.ID).Update("last_run_time", time.Now().Unix())
 
 	s.noticeLog(task.HarborKey, task.TaskName, "success")
 	s.log(logId, true, fmt.Sprintf("success"))

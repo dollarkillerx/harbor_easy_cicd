@@ -1,7 +1,14 @@
 package server
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
+	"io"
 )
 
 func (s *Server) webHook(ctx *gin.Context) {
@@ -65,3 +72,32 @@ type harborHook struct {
   }
 }
 */
+
+/*
+*
+tag commit
+Gitee:
+Github:
+*/
+func (s *Server) webHookGit(ctx *gin.Context) {
+	all, err := io.ReadAll(ctx.Request.Body)
+	if err == nil {
+		//log.Info().Msgf("%s", all)
+	}
+
+	log.Info().Msgf("ok ? %v", validateSignature(all, ctx.GetHeader("X-Hub-Signature-256")))
+
+	marshal, err := json.Marshal(ctx.Request.Header)
+	if err == nil {
+		fmt.Println(string(marshal))
+	}
+}
+
+// 验证 GitHub 发送的请求
+func validateSignature(payload []byte, signature string) bool {
+	mac := hmac.New(sha256.New, []byte("WUSmhf2tKuVhm"))
+	mac.Write(payload)
+	expectedMAC := mac.Sum(nil)
+	expectedSignature := "sha256=" + hex.EncodeToString(expectedMAC)
+	return hmac.Equal([]byte(expectedSignature), []byte(signature))
+}

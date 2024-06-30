@@ -157,3 +157,5 @@ dist
 .pnp.*
 .idea
 .vscode
+bolt.db
+bolt.db.lock
