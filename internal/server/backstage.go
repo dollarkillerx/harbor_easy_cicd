@@ -38,6 +38,17 @@ func (s *Server) tasks(ctx *gin.Context) {
 	resp.Resp(ctx, true, "success", tasks)
 }
 
+func (s *Server) gitTasks(ctx *gin.Context) {
+	var tasks []models.GitTask
+	if err := s.db.Model(&models.GitTask{}).Order("created_at desc").Find(&tasks).Error; err != nil {
+		log.Info().Msgf("tasks error: %s", err)
+		resp.Resp(ctx, false, "数据库异常", nil)
+		return
+	}
+
+	resp.Resp(ctx, true, "success", tasks)
+}
+
 func (s *Server) task(ctx *gin.Context) {
 	var input request.TaskPayload
 	if err := ctx.ShouldBindJSON(&input); err != nil {
@@ -103,4 +114,8 @@ func (s *Server) logs(ctx *gin.Context) {
 	}
 
 	resp.Resp(ctx, true, "success", logs)
+}
+
+func (s *Server) gitTask(ctx *gin.Context) {
+
 }

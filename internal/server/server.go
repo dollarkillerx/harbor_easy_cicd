@@ -56,7 +56,7 @@ func (s *Server) router() {
 	s.app.POST("/hook_github", s.webHookGithub)
 	s.app.POST("/hook_gitee", middleware.Auth(s.conf.AuthToken), s.webHookGitee)
 	s.app.POST("/hook_gitlab", middleware.Auth(s.conf.AuthToken), s.webHookGitlib)
-	//s.app.POST("/hook_git", middleware.Auth(s.conf.AuthToken), s.webHookGit)
+
 	s.app.GET("/heartbeat", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{
 			"message": "success",
@@ -72,7 +72,9 @@ func (s *Server) router() {
 	{
 		backstageInternal.GET("/tasks", s.tasks) // 查询
 		backstageInternal.POST("/task", s.task)  // 增 删 改
-		backstageInternal.GET("/logs", s.logs)   // 增 删 改
+		backstageInternal.GET("/logs", s.logs)   // logs
+		backstageInternal.GET("/git_tasks", s.gitTasks)
+		backstageInternal.GET("/git_task", s.gitTask)
 	}
 
 	// 所有其他请求都返回 index.html
