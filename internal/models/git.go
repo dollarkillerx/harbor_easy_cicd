@@ -4,6 +4,7 @@ type GitTask struct {
 	Model
 	GitAddress string       `json:"git_address"`
 	GitType    string       `json:"git_type"`
+	Repository string       `json:"repository"`
 	Branch     string       `json:"branch"`   // 为空 则匹配所有
 	Tag        string       `json:"tag"`      // 更具tag 匹配
 	Comment    string       `json:"comment"`  // 根据comment 匹配

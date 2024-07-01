@@ -8,6 +8,8 @@ import (
 	"github.com/dollarkillerx/harbor_easy_cicd/internal/models"
 	"github.com/gin-gonic/gin"
 	"io"
+	"os"
+	"strings"
 )
 
 func (s *Server) webHook(ctx *gin.Context) {
@@ -48,33 +50,9 @@ type harborHook struct {
 	} `json:"event_data"`
 }
 
-/**
-{
-  "type": "PUSH_ARTIFACT",
-  "occur_at": 1719318828,
-  "operator": "admin",
-  "event_data": {
-    "resources": [
-      {
-        "digest": "sha256:746da633881a7c6c6f9a4d77225c6aa1728394b01fc2fb41bc0591b5239bbd98",
-        "tag": "1.0.0",
-        "resource_url": "192.168.78.129:8787/library/followme:1.0.0"
-      }
-    ],
-    "repository": {
-      "date_created": 1719316269,
-      "name": "followme",
-      "namespace": "library",
-      "repo_full_name": "library/followme",
-      "repo_type": "public"
-    }
-  }
-}
-*/
-
 func (s *Server) webHookGithub(ctx *gin.Context) {
 	all, err := io.ReadAll(ctx.Request.Body)
-	if err == nil {
+	if err != nil {
 		ctx.JSON(400, gin.H{
 			"error": "400",
 		})
@@ -92,13 +70,35 @@ func (s *Server) webHookGithub(ctx *gin.Context) {
 	var tag models.GithubTag
 	if err := json.Unmarshal(all, &tag); err == nil {
 		if tag.RefType == "tag" {
-
+			var tagTasks []models.GitTask
+			s.db.Model(&models.GitTask{}).Where("matching = ?", models.MathTag).Where("git_type = ?", models.Github).Find(&tagTasks)
+			for _, v := range tagTasks {
+				// 项目判断
+				if strings.Contains(tag.Repository.FullName, v.Repository) {
+					if strings.Contains(tag.Ref, v.Tag) {
+						// develop
+					}
+				}
+			}
 		}
 	}
 
 	var push models.GitHubPush
 	if err := json.Unmarshal(all, &push); err == nil {
-
+		var tagTasks []models.GitTask
+		s.db.Model(&models.GitTask{}).Where("matching = ?", models.MathTag).Where("git_type = ?", models.Github).Find(&tagTasks)
+		for _, v := range tagTasks {
+			// 项目判断
+			if strings.Contains(push.Repository.FullName, v.Repository) {
+				// 分支判断
+				if strings.Contains(push.Ref, v.Branch) {
+					// comment判断
+					if strings.Contains(push.HeadCommit.Message, v.Comment) {
+						// develop
+					}
+				}
+			}
+		}
 	}
 
 	ctx.JSON(200, gin.H{})
@@ -106,7 +106,7 @@ func (s *Server) webHookGithub(ctx *gin.Context) {
 
 func (s *Server) webHookGitee(ctx *gin.Context) {
 	all, err := io.ReadAll(ctx.Request.Body)
-	if err == nil {
+	if err != nil {
 		ctx.JSON(400, gin.H{
 			"error": "400",
 		})
@@ -124,13 +124,35 @@ func (s *Server) webHookGitee(ctx *gin.Context) {
 	var tag models.GiteaTag
 	if err := json.Unmarshal(all, &tag); err == nil {
 		if tag.Action == "published" {
-
+			var tagTasks []models.GitTask
+			s.db.Model(&models.GitTask{}).Where("matching = ?", models.MathTag).Where("git_type = ?", models.Github).Find(&tagTasks)
+			for _, v := range tagTasks {
+				// 项目判断
+				if strings.Contains(tag.Repository.FullName, v.Repository) {
+					if strings.Contains(tag.Release.TagName, v.Tag) {
+						// develop
+					}
+				}
+			}
 		}
 	}
 
 	var push models.GitHubPush
 	if err := json.Unmarshal(all, &push); err == nil {
-
+		var tagTasks []models.GitTask
+		s.db.Model(&models.GitTask{}).Where("matching = ?", models.MathTag).Where("git_type = ?", models.Github).Find(&tagTasks)
+		for _, v := range tagTasks {
+			// 项目判断
+			if strings.Contains(push.Repository.FullName, v.Repository) {
+				// 分支判断
+				if strings.Contains(push.Ref, v.Branch) {
+					// comment判断
+					if strings.Contains(push.HeadCommit.Message, v.Comment) {
+						// develop
+					}
+				}
+			}
+		}
 	}
 
 	ctx.JSON(200, gin.H{})
@@ -138,26 +160,58 @@ func (s *Server) webHookGitee(ctx *gin.Context) {
 
 func (s *Server) webHookGitlib(ctx *gin.Context) {
 	all, err := io.ReadAll(ctx.Request.Body)
-	if err == nil {
+	if err != nil {
 		ctx.JSON(400, gin.H{
 			"error": "400",
 		})
 		return
 	}
 
+	os.WriteFile("all.json", all, 0644)
+
 	// 判断 tag push?
 	// tag 判断
 	var tag models.GitlabTag
 	if err := json.Unmarshal(all, &tag); err == nil {
 		if tag.ObjectKind == "tag_push" {
-
+			var tagTasks []models.GitTask
+			s.db.Model(&models.GitTask{}).Where("matching = ?", models.MathTag).Where("git_type = ?", models.Github).Find(&tagTasks)
+			for _, v := range tagTasks {
+				// 项目判断
+				if strings.Contains(tag.Repository.Url, v.Repository) {
+					// 分支判断
+					if strings.Contains(tag.Ref, v.Tag) {
+						// comment判断
+						//if len(tag.Commits) > 0 {
+						//	if strings.Contains(push.Commits[0].Message, v.Comment) {
+						//		// develop
+						//	}
+						//}
+					}
+				}
+			}
 		}
 	}
 
 	var push models.GitlabPush
 	if err := json.Unmarshal(all, &push); err == nil {
 		if tag.ObjectKind == "push" {
-
+			var tagTasks []models.GitTask
+			s.db.Model(&models.GitTask{}).Where("matching = ?", models.MathTag).Where("git_type = ?", models.Github).Find(&tagTasks)
+			for _, v := range tagTasks {
+				// 项目判断
+				if strings.Contains(push.Repository.Url, v.Repository) {
+					// 分支判断
+					if strings.Contains(push.Ref, v.Branch) {
+						// comment判断
+						if len(push.Commits) > 0 {
+							if strings.Contains(push.Commits[0].Message, v.Comment) {
+								// develop
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 
