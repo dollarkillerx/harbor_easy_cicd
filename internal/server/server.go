@@ -53,9 +53,9 @@ func (s *Server) router() {
 	//s.app.LoadHTMLFiles("dist/index.html")
 
 	s.app.POST("/hook", middleware.Auth(s.conf.AuthToken), s.webHook)
-	s.app.POST("/hook_github", s.webHookGit)
-	s.app.POST("/hook_gitee", s.webHookGit)
-	s.app.POST("/hook_gitlab", s.webHookGit)
+	s.app.POST("/hook_github", s.webHookGithub)
+	s.app.POST("/hook_gitee", middleware.Auth(s.conf.AuthToken), s.webHookGitee)
+	s.app.POST("/hook_gitlab", middleware.Auth(s.conf.AuthToken), s.webHookGitlib)
 	//s.app.POST("/hook_git", middleware.Auth(s.conf.AuthToken), s.webHookGit)
 	s.app.GET("/heartbeat", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{

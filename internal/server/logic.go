@@ -5,9 +5,8 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
+	"github.com/dollarkillerx/harbor_easy_cicd/internal/models"
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog/log"
 	"io"
 )
 
@@ -73,24 +72,96 @@ type harborHook struct {
 }
 */
 
-/*
-*
-tag commit
-Gitee:
-Github:
-*/
-func (s *Server) webHookGit(ctx *gin.Context) {
+func (s *Server) webHookGithub(ctx *gin.Context) {
 	all, err := io.ReadAll(ctx.Request.Body)
 	if err == nil {
-		//log.Info().Msgf("%s", all)
+		ctx.JSON(400, gin.H{
+			"error": "400",
+		})
+		return
 	}
 
-	log.Info().Msgf("ok ? %v", validateSignature(all, ctx.GetHeader("X-Hub-Signature-256")))
+	if !validateSignature(all, ctx.GetHeader("X-Hub-Signature-256")) {
+		ctx.JSON(401, gin.H{
+			"error": "auth error",
+		})
+		return
+	}
+	// 判断 tag push?
+	// tag 判断
+	var tag models.GithubTag
+	if err := json.Unmarshal(all, &tag); err == nil {
+		if tag.RefType == "tag" {
 
-	marshal, err := json.Marshal(ctx.Request.Header)
+		}
+	}
+
+	var push models.GitHubPush
+	if err := json.Unmarshal(all, &push); err == nil {
+
+	}
+
+	ctx.JSON(200, gin.H{})
+}
+
+func (s *Server) webHookGitee(ctx *gin.Context) {
+	all, err := io.ReadAll(ctx.Request.Body)
 	if err == nil {
-		fmt.Println(string(marshal))
+		ctx.JSON(400, gin.H{
+			"error": "400",
+		})
+		return
 	}
+
+	if !validateSignature(all, ctx.GetHeader("X-Hub-Signature-256")) {
+		ctx.JSON(401, gin.H{
+			"error": "auth error",
+		})
+		return
+	}
+	// 判断 tag push?
+	// tag 判断
+	var tag models.GiteaTag
+	if err := json.Unmarshal(all, &tag); err == nil {
+		if tag.Action == "published" {
+
+		}
+	}
+
+	var push models.GitHubPush
+	if err := json.Unmarshal(all, &push); err == nil {
+
+	}
+
+	ctx.JSON(200, gin.H{})
+}
+
+func (s *Server) webHookGitlib(ctx *gin.Context) {
+	all, err := io.ReadAll(ctx.Request.Body)
+	if err == nil {
+		ctx.JSON(400, gin.H{
+			"error": "400",
+		})
+		return
+	}
+
+	// 判断 tag push?
+	// tag 判断
+	var tag models.GitlabTag
+	if err := json.Unmarshal(all, &tag); err == nil {
+		if tag.ObjectKind == "tag_push" {
+
+		}
+	}
+
+	var push models.GitlabPush
+	if err := json.Unmarshal(all, &push); err == nil {
+		if tag.ObjectKind == "push" {
+
+		}
+	}
+
+	ctx.JSON(200, gin.H{})
 }
 
 // 验证 GitHub 发送的请求

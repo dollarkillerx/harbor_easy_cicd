@@ -2,10 +2,12 @@ package models
 
 type GitTask struct {
 	Model
-	Branch   string       // 为空 则匹配所有
-	Tag      string       // 更具tag 匹配
-	Comment  string       // 根据comment 匹配
-	Matching MatchingType // 匹配方式
+	GitAddress string       `json:"git_address"`
+	GitType    string       `json:"git_type"`
+	Branch     string       `json:"branch"`   // 为空 则匹配所有
+	Tag        string       `json:"tag"`      // 更具tag 匹配
+	Comment    string       `json:"comment"`  // 根据comment 匹配
+	Matching   MatchingType `json:"matching"` // 匹配方式
 
 	TaskName  string `json:"task_name"`
 	Path      string `json:"path"`
@@ -23,44 +25,13 @@ const (
 	MathComment MatchingType = "MathComment"
 )
 
-// github gitee
-type GitPush struct {
-	Ref        string `json:"ref"` // refs/heads/main
-	HeadCommit struct {
-		Id      string `json:"id"`
-		Message string `json:"message"`
-	} `json:"head_commit"`
-	Repository struct {
-		Name     string `json:"name"`
-		FullName string `json:"full_name"` // path (user/project)
-	} `json:"repository"`
-}
+type GitType string
 
-type GithubTag struct {
-	Ref          string  `json:"ref"`           // tag name
-	RefType      string  `json:"ref_type"`      // type: tag
-	MasterBranch string  `json:"master_branch"` // branch
-	Description  *string `json:"description"`
-	Repository   struct {
-		Name     string `json:"name"`
-		FullName string `json:"full_name"` // path (user/project)
-	} `json:"repository"`
-}
-
-type GiteeTag struct {
-	Action  string `json:"action"`
-	Release struct {
-		TagName         string `json:"tag_name"`         // tag name
-		TargetCommitish string `json:"target_commitish"` // 分支
-		Name            string `json:"name"`
-		Body            string `json:"body"`
-	} `json:"release"`
-	Repository struct {
-		Name        string `json:"name"`
-		FullName    string `json:"full_name"` // path (user/project)
-		Description string `json:"description"`
-	} `json:"repository"`
-}
+const (
+	Github GitType = "Github"
+	Gitea  GitType = "Gitea"
+	Gitlab GitType = "Gitlab"
+)
 
 type GitlabPush struct {
 	ObjectKind string `json:"object_kind"` // push
@@ -84,5 +55,38 @@ type GitlabTag struct {
 	Repository   struct {
 		Name string `json:"name"`
 		Url  string `json:"url"` // path (user/project)
+	} `json:"repository"`
+}
+
+// Gitea 相同
+type GitHubPush struct {
+	Ref        string `json:"ref"` // refs/heads/main
+	Repository struct {
+		Id       int    `json:"id"`
+		Name     string `json:"name"`      // project name
+		FullName string `json:"full_name"` // file project name
+	} `json:"repository"`
+	HeadCommit struct {
+		Message string `json:"message"` // comment
+	} `json:"head_commit"`
+}
+
+type GithubTag struct {
+	Ref        string `json:"ref"`      // tag 0.0.1
+	RefType    string `json:"ref_type"` // type: tag
+	Repository struct {
+		Name     string `json:"name"`
+		FullName string `json:"full_name"`
+	} `json:"repository"`
+}
+
+type GiteaTag struct {
+	Action  string `json:"action"` // published
+	Release struct {
+		TagName string `json:"tag_name"`
+	} `json:"release"`
+	Repository struct {
+		Name     string `json:"name"`
+		FullName string `json:"full_name"`
 	} `json:"repository"`
 }
