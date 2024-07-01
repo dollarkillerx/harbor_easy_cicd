@@ -1,15 +1,17 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/dollarkillerx/harbor_easy_cicd/internal/models"
-	"github.com/dollarkillerx/harbor_easy_cicd/internal/utils"
-	"github.com/rs/zerolog/log"
 	"net/http"
 	"os"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/dollarkillerx/harbor_easy_cicd/internal/models"
+	"github.com/dollarkillerx/harbor_easy_cicd/internal/utils"
+	"github.com/rs/zerolog/log"
 )
 
 var mu sync.Mutex
@@ -31,20 +33,35 @@ func (s *Server) cicd(hk harborHook) {
 	}
 }
 
+type LogJson []string
+
+func (l LogJson) ToJson() string {
+	marshal, err := json.Marshal(l)
+	if err != nil {
+		return ""
+	}
+	return string(marshal)
+}
+
 func (s *Server) initLog(task models.Task) uint {
 	var log = models.TaskLogs{
 		TaskId:   task.ID,
 		TaskName: task.TaskName,
-		Message:  "初始化任务",
+		Message:  LogJson{"获取到任务"}.ToJson(),
 	}
 	s.db.Model(&models.TaskLogs{}).Create(&log)
 	return log.ID
 }
 
 func (s *Server) log(id uint, success bool, message string) {
+	var logs LogJson
+	s.db.Model(&models.TaskLogs{}).Where("id = ?", id).Find(&logs)
+
+	logs = append(logs, message)
+
 	s.db.Model(&models.TaskLogs{}).Where("id = ?", id).Updates(&models.TaskLogs{
 		Success: success,
-		Message: message,
+		Message: logs.ToJson(),
 	})
 }
 
