@@ -74,7 +74,7 @@ func (s *Server) router() {
 		backstageInternal.POST("/task", s.task)  // 增 删 改
 		backstageInternal.GET("/logs", s.logs)   // logs
 		backstageInternal.GET("/git_tasks", s.gitTasks)
-		backstageInternal.GET("/git_task", s.gitTask)
+		backstageInternal.POST("/git_task", s.gitTask)
 	}
 
 	// 所有其他请求都返回 index.html

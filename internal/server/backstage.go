@@ -117,5 +117,66 @@ func (s *Server) logs(ctx *gin.Context) {
 }
 
 func (s *Server) gitTask(ctx *gin.Context) {
+	var payload request.GitTaskPayload
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		resp.Resp(ctx, false, err.Error(), nil)
+		return
+	}
+
+	if err := payload.Validate(); err != nil {
+		resp.Resp(ctx, false, err.Error(), nil)
+		return
+	}
+
+	var err error
+
+	switch payload.Type {
+	case request.TaskAdd:
+		err = s.db.Model(&models.GitTask{}).Create(&models.GitTask{
+			GitAddress:  payload.GitAddress,
+			GitType:     payload.GitType,
+			Repository:  payload.Repository,
+			Branch:      payload.Branch,
+			Tag:         payload.Tag,
+			Comment:     payload.Comment,
+			Matching:    payload.Matching,
+			TaskName:    payload.TaskName,
+			Path:        payload.Path,
+			Cmd:         payload.Cmd,
+			Heartbeat:   payload.Heartbeat,
+			Run:         false,
+			LastRunTime: 0,
+		}).Error
+	case request.TaskDel:
+		err = s.db.Model(&models.GitTask{}).Where("id = ?", payload.TaskId).Delete(&models.GitTask{}).Error
+	case request.TaskEdit:
+		err = s.db.Model(&models.GitTask{}).Where("id = ?", payload.TaskId).Updates(&models.GitTask{
+			GitAddress: payload.GitAddress,
+			GitType:    payload.GitType,
+			Repository: payload.Repository,
+			Branch:     payload.Branch,
+			Tag:        payload.Tag,
+			Comment:    payload.Comment,
+			Matching:   payload.Matching,
+			TaskName:   payload.TaskName,
+			Path:       payload.Path,
+			Cmd:        payload.Cmd,
+			Heartbeat:  payload.Heartbeat,
+		}).Error
+	case request.TaskStart:
+		err = s.db.Model(&models.GitTask{}).Where("id = ?", payload.TaskId).
+			Update("run", true).Error
+	case request.TaskStop:
+		err = s.db.Model(&models.GitTask{}).Where("id = ?", payload.TaskId).
+			Update("run", false).Error
+	}
+
+	if err != nil {
+		log.Error().Msgf("up err: %v", err)
+		resp.Resp(ctx, false, err.Error(), nil)
+		return
+	}
+
+	resp.Resp(ctx, true, "success", nil)
 
 }
