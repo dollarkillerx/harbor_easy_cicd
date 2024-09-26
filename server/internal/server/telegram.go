@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Server) telegram() {
-	if s.conf.TelegramConfig == nil {
+	if s.conf.TelegramUserRegisterToken == "" {
 		return
 	}
 
@@ -58,7 +58,7 @@ func (s *Server) telegram() {
 		if update.Message != nil { // If we got a message
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 			update.Message.Text = strings.TrimSpace(update.Message.Text)
-			if update.Message.Text != s.conf.TelegramConfig.UserRegisterToken {
+			if update.Message.Text != s.conf.TelegramUserRegisterToken {
 				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "身份验证失败")
 				msg.ReplyToMessageID = update.Message.MessageID
 				bot.Send(msg)

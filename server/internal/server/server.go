@@ -23,7 +23,7 @@ func NewServer(conf *conf.Config) *Server {
 		panic(err)
 	}
 
-	postgresClient.AutoMigrate(&models.Task{}, &models.TaskLogs{}, &models.GitTask{})
+	postgresClient.AutoMigrate(&models.Task{}, &models.TaskLogs{}, &models.GitTask{}, &models.Telegram{})
 
 	return &Server{
 		conf:     conf,

@@ -19,14 +19,14 @@ type Task struct {
 
 type TaskLogs struct {
 	Model
-	TaskId   uint   `json:"task_id"`
+	TaskId   string `json:"task_id"`
 	TaskName string `json:"task_name"`
 	Success  bool   `json:"success"`
 	Message  string `json:"message"`
 }
 
 type Model struct {
-	ID        uint           `gorm:"primarykey"`
+	ID        string         `gorm:"primarykey"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"`

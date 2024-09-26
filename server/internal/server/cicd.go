@@ -43,7 +43,7 @@ func (l LogJson) ToJson() string {
 	return string(marshal)
 }
 
-func (s *Server) initLog(task models.Task) uint {
+func (s *Server) initLog(task models.Task) string {
 	var log = models.TaskLogs{
 		TaskId:   task.ID,
 		TaskName: task.TaskName,
@@ -53,7 +53,7 @@ func (s *Server) initLog(task models.Task) uint {
 	return log.ID
 }
 
-func (s *Server) log(id uint, success bool, message string) {
+func (s *Server) log(id string, success bool, message string) {
 	var logs LogJson
 	s.db.Model(&models.TaskLogs{}).Where("id = ?", id).Find(&logs)
 

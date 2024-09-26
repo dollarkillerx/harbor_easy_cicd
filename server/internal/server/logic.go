@@ -292,7 +292,7 @@ func (s *Server) gitCicd(task models.GitTask) {
 	s.log(logId, true, "success")
 }
 
-func (s *Server) initGithubLog(task models.GitTask) uint {
+func (s *Server) initGithubLog(task models.GitTask) string {
 	var log = models.TaskLogs{
 		TaskId:   task.ID,
 		TaskName: task.TaskName,
